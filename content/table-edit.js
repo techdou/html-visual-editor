@@ -5,6 +5,7 @@ window.HVE_TableEdit = (function () {
   let tableMenu = null;
 
   function activate() {
+    if (isActive) return;
     isActive = true;
     document.addEventListener('contextmenu', onContextMenu, true);
     document.addEventListener('click', onDocClick, true);

@@ -18,6 +18,9 @@ window.HVE_Core = (function () {
     if (window.HVE_ContextMenu) window.HVE_ContextMenu.activate();
     if (window.HVE_AlignGuide) window.HVE_AlignGuide.activate();
     if (window.HVE_PageSorter) window.HVE_PageSorter.activate();
+    if (window.HVE_Canvas) window.HVE_Canvas.activate();
+    if (window.HVE_PDFPaginator) window.HVE_PDFPaginator.activate();
+    if (window.HVE_ChartTypo) window.HVE_ChartTypo.activate();
 
     document.addEventListener('keydown', onKeyDown, true);
     showStatusIndicator();
@@ -199,21 +202,12 @@ window.HVE_Core = (function () {
         for (const el of selectedEls) {
           const beforeTransform = el.style.transform || '';
 
-          // 解析当前 translate 值
-          const match = beforeTransform.match(/translate\(([^,]+)px,\s*([^)]+)px\)/);
-          let curTx = 0, curTy = 0;
-          if (match) {
-            curTx = parseFloat(match[1]) || 0;
-            curTy = parseFloat(match[2]) || 0;
-          }
+          const { tx: curTx, ty: curTy } = window.HVE_Helpers.parseTranslate(beforeTransform);
 
           const newTx = curTx + dx;
           const newTy = curTy + dy;
 
-          // 设置新的 translate
-          const cleaned = beforeTransform.replace(/translate\([^)]+\)\s*/g, '').trim();
-          const translateStr = `translate(${newTx}px, ${newTy}px)`;
-          el.style.transform = cleaned ? `${translateStr} ${cleaned}` : translateStr;
+          window.HVE_Helpers.setTranslate(el, newTx, newTy);
 
           // 记录历史
           if (window.HVE_History) {
@@ -477,22 +471,38 @@ window.HVE_Core = (function () {
             try {
               const result = await window.HVE_FileManager?.openFile();
               if (result) {
-                // 先关闭编辑器
-                disable();
-                // 使用 DOMParser 解析新内容，替换 head 和 body 而不销毁 content scripts
                 const parser = new DOMParser();
                 const newDoc = parser.parseFromString(result.content, 'text/html');
-                // 替换 head 内容
-                document.head.innerHTML = newDoc.head.innerHTML;
-                // 替换 body 内容
-                document.body.innerHTML = newDoc.body.innerHTML;
-                // 复制 body 属性
-                Array.from(newDoc.body.attributes).forEach(attr => {
-                  document.body.setAttribute(attr.name, attr.value);
-                });
-                // 清除历史
+
+                if (!newDoc || !newDoc.body) {
+                  sendResponse({ success: false, error: '文件解析失败' });
+                  return;
+                }
+
+                const backupHead = document.head.innerHTML;
+                const backupBody = document.body.innerHTML;
+                const backupBodyAttrs = document.body.attributes;
+
+                disable();
+
+                try {
+                  document.head.innerHTML = newDoc.head.innerHTML;
+                  document.body.innerHTML = newDoc.body.innerHTML;
+                  Array.from(newDoc.body.attributes).forEach(attr => {
+                    document.body.setAttribute(attr.name, attr.value);
+                  });
+                } catch (replaceErr) {
+                  document.head.innerHTML = backupHead;
+                  document.body.innerHTML = backupBody;
+                  Array.from(backupBodyAttrs).forEach(attr => {
+                    document.body.setAttribute(attr.name, attr.value);
+                  });
+                  setTimeout(() => enable(), 300);
+                  sendResponse({ success: false, error: '文件内容替换失败: ' + replaceErr.message });
+                  return;
+                }
+
                 if (window.HVE_History) window.HVE_History.clear();
-                // 重新启用编辑器
                 setTimeout(() => enable(), 300);
               }
               sendResponse({ success: true });

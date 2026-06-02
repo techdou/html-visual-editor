@@ -82,7 +82,7 @@ window.HVE_FileManager = (function () {
     a.href = url;
     a.download = filename;
     a.click();
-    URL.revokeObjectURL(url);
+    setTimeout(() => URL.revokeObjectURL(url), 10000);
     return true;
   }
 

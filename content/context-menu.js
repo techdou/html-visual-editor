@@ -5,6 +5,7 @@ window.HVE_ContextMenu = (function () {
   let copiedStyle = null; // 存储复制的样式
 
   function activate() {
+    if (isActive) return;
     isActive = true;
     document.addEventListener('contextmenu', onContextMenu, true);
   }

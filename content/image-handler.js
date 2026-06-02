@@ -5,6 +5,7 @@ window.HVE_ImageHandler = (function () {
   let dropIndicator = null;  // 插入位置指示线
 
   function activate() {
+    if (isActive) return;
     isActive = true;
     document.addEventListener('paste', onPaste, true);
     document.addEventListener('dragenter', onDragEnter, true);

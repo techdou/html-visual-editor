@@ -5,6 +5,7 @@ window.HVE_TextEdit = (function () {
   let originalContent = '';
 
   function activate() {
+    if (isActive) return;
     isActive = true;
     document.addEventListener('dblclick', onDoubleClick, true);
     document.addEventListener('keydown', onGlobalKeyDown, true);
