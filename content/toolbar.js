@@ -5,7 +5,7 @@ window.HVE_Toolbar = (function () {
   let isActive = false;
   let activeDropdown = null;
 
-  function activate() { isActive = true; }
+  function activate() { if (isActive) return; isActive = true; }
 
   function deactivate() {
     isActive = false;
