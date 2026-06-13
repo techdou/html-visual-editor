@@ -8,6 +8,7 @@ window.HVE_PageSorter = (function () {
   let dragStartIdx = -1;
 
   function activate() {
+    if (isActive) return;
     isActive = true;
   }
 

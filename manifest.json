@@ -33,6 +33,7 @@
     {
       "matches": ["<all_urls>", "file:///*"],
       "js": [
+        "utils/helpers.js",
         "utils/html-serializer.js",
         "utils/file-manager.js",
         "content/history.js",

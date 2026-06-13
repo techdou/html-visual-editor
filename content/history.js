@@ -29,7 +29,13 @@ window.HVE_History = (function () {
     if (undoStack.length === 0) return null;
     const action = undoStack.pop();
     redoStack.push(action);
-    applyState(action, 'undo');
+    try {
+      applyState(action, 'undo');
+    } catch (e) {
+      redoStack.pop();
+      undoStack.push(action);
+      console.error('[HVE] undo 失败，已恢复栈状态:', e);
+    }
     return action;
   }
 
@@ -37,7 +43,13 @@ window.HVE_History = (function () {
     if (redoStack.length === 0) return null;
     const action = redoStack.pop();
     undoStack.push(action);
-    applyState(action, 'redo');
+    try {
+      applyState(action, 'redo');
+    } catch (e) {
+      undoStack.pop();
+      redoStack.push(action);
+      console.error('[HVE] redo 失败，已恢复栈状态:', e);
+    }
     return action;
   }
 
@@ -270,13 +282,14 @@ window.HVE_History = (function () {
   /**
    * 为元素生成一个可复现的唯一 CSS 选择器
    */
+  let _idCounter = 0;
+
   function getUniqueSelector(el) {
     if (el.id && !el.id.startsWith('hve-')) {
       return '#' + CSS.escape(el.id);
     }
 
-    // 临时分配一个唯一 ID
-    const tempId = 'hve-tmp-' + Date.now() + '-' + Math.random().toString(36).substr(2, 6);
+    const tempId = 'hve-tmp-' + (++_idCounter) + '-' + Math.random().toString(36).substr(2, 6);
     el.setAttribute('data-hve-id', tempId);
     return '[data-hve-id="' + tempId + '"]';
   }

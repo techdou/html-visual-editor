@@ -68,6 +68,7 @@
         await chrome.scripting.executeScript({
           target: { tabId: tab.id },
           files: [
+            'utils/helpers.js',
             'utils/html-serializer.js',
             'utils/file-manager.js',
             'content/history.js',
@@ -82,6 +83,9 @@
             'content/insert-panel.js',
             'content/context-menu.js',
             'content/page-sorter.js',
+            'content/canvas-mode.js',
+            'content/pdf-paginator.js',
+            'content/chart-typography.js',
             'content/editor-core.js'
           ]
         });

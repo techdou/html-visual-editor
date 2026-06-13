@@ -13,6 +13,7 @@ window.HVE_DragMove = (function () {
   const DRAG_THRESHOLD = 5;      // 拖拽启动阈值 (px)
 
   function activate() {
+    if (isActive) return;
     isActive = true;
     document.addEventListener('mousedown', onMouseDown, true);
   }
@@ -126,9 +127,7 @@ window.HVE_DragMove = (function () {
     beforeStates = [];
 
     for (const el of dragTargets) {
-      // 读取当前 transform 中的 translate 值
-      const currentTransform = el.style.transform || '';
-      const { tx, ty } = parseTranslate(currentTransform);
+      const { tx, ty } = window.HVE_Helpers.parseTranslate(el.style.transform || '');
 
       origStates.push({ origTx: tx, origTy: ty });
 
@@ -141,28 +140,6 @@ window.HVE_DragMove = (function () {
 
     document.addEventListener('mousemove', onMouseMove, true);
     document.addEventListener('mouseup', onMouseUp, true);
-  }
-
-  /**
-   * 解析 transform 中的 translate 值
-   */
-  function parseTranslate(transform) {
-    const match = transform.match(/translate\(([^,]+)px,\s*([^)]+)px\)/);
-    if (match) {
-      return { tx: parseFloat(match[1]) || 0, ty: parseFloat(match[2]) || 0 };
-    }
-    return { tx: 0, ty: 0 };
-  }
-
-  /**
-   * 设置 transform: translate()，保留其他 transform 属性
-   */
-  function setTranslate(el, tx, ty) {
-    const current = el.style.transform || '';
-    // 移除已有的 translate
-    const cleaned = current.replace(/translate\([^)]+\)\s*/g, '').trim();
-    const translateStr = `translate(${tx}px, ${ty}px)`;
-    el.style.transform = cleaned ? `${translateStr} ${cleaned}` : translateStr;
   }
 
   function applyDrag(e) {
@@ -193,7 +170,7 @@ window.HVE_DragMove = (function () {
     for (let i = 0; i < dragTargets.length; i++) {
       const el = dragTargets[i];
       const orig = origStates[i];
-      setTranslate(el, orig.origTx + dx + snapDx, orig.origTy + dy + snapDy);
+      window.HVE_Helpers.setTranslate(el, orig.origTx + dx + snapDx, orig.origTy + dy + snapDy);
     }
   }
 

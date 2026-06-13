@@ -21,6 +21,7 @@ window.HVE_Selector = (function () {
   const EXCLUDED_TAGS = new Set(['HTML', 'HEAD', 'SCRIPT', 'STYLE', 'LINK', 'META', 'BR']);
 
   function activate() {
+    if (isActive) return;
     isActive = true;
     document.addEventListener('mousemove', onMouseMove, true);
     document.addEventListener('click', onClick, true);

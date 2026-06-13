@@ -7,8 +7,8 @@ window.HVE_InsertPanel = (function () {
   let insertPosition = null; // 'before' | 'after' | 'append'
 
   function activate() {
+    if (isActive) return;
     isActive = true;
-    // 不再监听单击来显示+号按钮，改为只在双击空白区域时显示+号
     document.addEventListener('dblclick', onBodyDblClick, true);
   }
 

@@ -5,7 +5,7 @@ window.HVE_Toolbar = (function () {
   let isActive = false;
   let activeDropdown = null;
 
-  function activate() { isActive = true; }
+  function activate() { if (isActive) return; isActive = true; }
 
   function deactivate() {
     isActive = false;
@@ -548,11 +548,7 @@ window.HVE_Toolbar = (function () {
   }
 
   function rgbToHex(rgb) {
-    if (!rgb || rgb === 'transparent' || rgb.includes('rgba(0, 0, 0, 0)')) return '#ffffff';
-    if (rgb.startsWith('#')) return rgb;
-    const m = rgb.match(/\d+/g);
-    if (!m || m.length < 3) return '#000000';
-    return '#' + m.slice(0,3).map(n => parseInt(n).toString(16).padStart(2,'0')).join('');
+    return window.HVE_Helpers.rgbToHex(rgb);
   }
 
   // 自定义颜色选择面板 — 可靠且美观

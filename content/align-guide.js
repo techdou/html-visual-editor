@@ -8,6 +8,7 @@ window.HVE_AlignGuide = (function () {
   const EQUAL_COLOR = '#2563EB'; // 等距辅助线颜色（蓝色）
 
   function activate() {
+    if (isActive) return;
     isActive = true;
   }
 

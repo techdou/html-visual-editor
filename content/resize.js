@@ -104,11 +104,7 @@ window.HVE_Resize = (function () {
     origWidth = parseFloat(computed.width);
     origHeight = parseFloat(computed.height);
 
-    // 读取当前 transform 中的 translate 值（与 drag-move.js 保持一致）
-    const transform = currentTarget.style.transform || '';
-    const translateMatch = transform.match(/translate\(([^,]+)px,\s*([^)]+)px\)/);
-    origLeft = translateMatch ? parseFloat(translateMatch[1]) || 0 : 0;
-    origTop = translateMatch ? parseFloat(translateMatch[2]) || 0 : 0;
+    const { tx: origLeft, ty: origTop } = window.HVE_Helpers.parseTranslate(currentTarget.style.transform || '');
 
     beforeState = {
       width: currentTarget.style.width || '',
@@ -157,13 +153,9 @@ window.HVE_Resize = (function () {
     currentTarget.style.height = newHeight + 'px';
 
     if (dir.includes('w') || dir.includes('n')) {
-      // 使用 transform: translate() 来补偿位置偏移，与 drag-move.js 一致
       const tx = dir.includes('w') ? newLeft : origLeft;
       const ty = dir.includes('n') ? newTop : origTop;
-      const current = currentTarget.style.transform || '';
-      const cleaned = current.replace(/translate\([^)]+\)\s*/g, '').trim();
-      const translateStr = `translate(${tx}px, ${ty}px)`;
-      currentTarget.style.transform = cleaned ? `${translateStr} ${cleaned}` : translateStr;
+      window.HVE_Helpers.setTranslate(currentTarget, tx, ty);
     }
 
     updateHandlePositions();
