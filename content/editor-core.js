@@ -259,6 +259,9 @@ window.HVE_Core = (function () {
       e.preventDefault();
       if (window.HVE_PageSorter) window.HVE_PageSorter.toggleSorter();
     }
+
+    // 委托给快捷键系统处理动态注册的快捷键
+    if (window.HVE_Shortcuts && window.HVE_Shortcuts.handle(e)) return;
   }
 
   async function saveCurrentFile() {

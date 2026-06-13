@@ -85,6 +85,7 @@ async function injectContentScripts(tabId) {
         'content/canvas-mode.js',
         'content/pdf-paginator.js',
         'content/chart-typography.js',
+        'content/shortcut-system.js',
         'content/editor-core.js'
       ]
     });
