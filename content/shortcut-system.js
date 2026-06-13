@@ -338,6 +338,32 @@ window.HVE_Shortcuts = (function () {
     condition: () => !window.HVE_TextEdit?.isEditing(),
   });
 
+  // ========== 注册查找替换快捷键 ==========
+
+  register({
+    combo: 'Ctrl+F',
+    action: () => {
+      if (window.HVE_TextEdit?.isEditing()) window.HVE_TextEdit.finishEditing();
+      if (window.HVE_FindReplace) window.HVE_FindReplace.openPanel(false);
+      return true;
+    },
+    description: '查找',
+    category: '编辑',
+    condition: () => !window.HVE_TextEdit?.isEditing() || true, // 查找总是可用
+  });
+
+  register({
+    combo: 'Ctrl+H',
+    action: () => {
+      if (window.HVE_TextEdit?.isEditing()) window.HVE_TextEdit.finishEditing();
+      if (window.HVE_FindReplace) window.HVE_FindReplace.openPanel(true);
+      return true;
+    },
+    description: '查找和替换',
+    category: '编辑',
+    condition: () => !window.HVE_TextEdit?.isEditing() || true,
+  });
+
   // ========== 公共 API ==========
 
   return {

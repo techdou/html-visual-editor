@@ -755,8 +755,35 @@ window.HVE_Selector = (function () {
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="9" y1="12" x2="21" y2="12"/><line x1="6" y1="18" x2="21" y2="18"/></svg>
         </button>
         <span class="hve-multi-sep"></span>
+        <button data-multi-action="pos-align-top" title="顶部对齐">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="6" y1="3" x2="6" y2="21"/><line x1="6" y1="3" x2="18" y2="3"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+        </button>
+        <button data-multi-action="pos-align-bottom" title="底部对齐">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="6" y1="21" x2="6" y2="3"/><line x1="6" y1="21" x2="18" y2="21"/><line x1="12" y1="21" x2="12" y2="9"/></svg>
+        </button>
+        <button data-multi-action="pos-align-vcenter" title="垂直居中对齐">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="6" y1="12" x2="18" y2="12"/><line x1="6" y1="6" x2="6" y2="18"/><line x1="12" y1="6" x2="12" y2="18"/></svg>
+        </button>
+        <button data-multi-action="pos-align-hcenter" title="水平居中对齐">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="12" y1="6" x2="12" y2="18"/><line x1="6" y1="6" x2="18" y2="6"/><line x1="6" y1="12" x2="18" y2="12"/></svg>
+        </button>
+        <span class="hve-multi-sep"></span>
+        <button data-multi-action="distribute-h" title="水平等间距分布">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="8" x2="4" y2="16"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="20" y1="8" x2="20" y2="16"/></svg>
+        </button>
+        <button data-multi-action="distribute-v" title="垂直等间距分布">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="12" y1="4" x2="12" y2="20"/><line x1="8" y1="4" x2="16" y2="4"/><line x1="8" y1="12" x2="16" y2="12"/><line x1="8" y1="20" x2="16" y2="20"/></svg>
+        </button>
+        <span class="hve-multi-sep"></span>
         <button data-multi-action="same-width" title="统一宽度">W</button>
         <button data-multi-action="same-height" title="统一高度">H</button>
+        <span class="hve-multi-sep"></span>
+        <button data-multi-action="batch-fontsize" title="批量设置字号" class="hve-multi-btn-fontsize">
+          <span>A<sub>s</sub></span>
+        </button>
+        <button data-multi-action="batch-color" title="批量设置颜色" class="hve-multi-btn-color">
+          <input type="color" data-multi-color-input value="#000000" />
+        </button>
         <span class="hve-multi-sep"></span>
         <button data-multi-action="copy-style" title="复制样式 (⌘⇧C)">🎨</button>
         <button data-multi-action="paste-style" title="粘贴样式 (⌘⇧V)">🖌️</button>
@@ -769,6 +796,11 @@ window.HVE_Selector = (function () {
     // 事件绑定
     multiSelectToast.addEventListener('mousedown', (e) => e.preventDefault());
     multiSelectToast.addEventListener('click', onMultiActionClick);
+    // 颜色选择器 change 事件
+    const colorInput = multiSelectToast.querySelector('[data-multi-color-input]');
+    if (colorInput) {
+      colorInput.addEventListener('input', onMultiColorChange);
+    }
     document.body.appendChild(multiSelectToast);
   }
 
@@ -781,27 +813,72 @@ window.HVE_Selector = (function () {
     const elements = [...selectedElements];
     if (elements.length === 0) return;
 
+    // 过滤锁定元素
+    const unlocked = elements.filter(el => !el.hasAttribute('data-hve-locked'));
+    if (unlocked.length === 0 && action !== 'copy-style') {
+      if (window.HVE_Core) window.HVE_Core.showToast('元素已锁定，无法操作 🔒', 'info');
+      return;
+    }
+
     switch (action) {
+      // 文本对齐（原有）
       case 'align-left':
-        batchSetStyle(elements, 'textAlign', 'left');
+        batchSetStyle(unlocked, 'textAlign', 'left');
         break;
       case 'align-center':
-        batchSetStyle(elements, 'textAlign', 'center');
+        batchSetStyle(unlocked, 'textAlign', 'center');
         break;
       case 'align-right':
-        batchSetStyle(elements, 'textAlign', 'right');
+        batchSetStyle(unlocked, 'textAlign', 'right');
         break;
+
+      // 位置对齐（新增）
+      case 'pos-align-top':
+        batchPositionAlign(unlocked, 'top');
+        break;
+      case 'pos-align-bottom':
+        batchPositionAlign(unlocked, 'bottom');
+        break;
+      case 'pos-align-vcenter':
+        batchPositionAlign(unlocked, 'vcenter');
+        break;
+      case 'pos-align-hcenter':
+        batchPositionAlign(unlocked, 'hcenter');
+        break;
+
+      // 等间距分布（新增）
+      case 'distribute-h':
+        batchDistribute(unlocked, 'horizontal');
+        break;
+      case 'distribute-v':
+        batchDistribute(unlocked, 'vertical');
+        break;
+
+      // 统一宽高（原有）
       case 'same-width': {
-        // 取第一个元素的宽度作为标准
-        const refWidth = elements[0].getBoundingClientRect().width;
-        batchSetStyle(elements, 'width', refWidth + 'px');
+        const refWidth = unlocked[0].getBoundingClientRect().width;
+        batchSetStyle(unlocked, 'width', refWidth + 'px');
         break;
       }
       case 'same-height': {
-        const refHeight = elements[0].getBoundingClientRect().height;
-        batchSetStyle(elements, 'height', refHeight + 'px');
+        const refHeight = unlocked[0].getBoundingClientRect().height;
+        batchSetStyle(unlocked, 'height', refHeight + 'px');
         break;
       }
+
+      // 批量字号（新增）
+      case 'batch-fontsize': {
+        showBatchFontSizePopover(btn, unlocked);
+        break;
+      }
+
+      // 批量颜色 — 点击按钮时打开颜色选择器
+      case 'batch-color': {
+        const colorInput = btn.querySelector('[data-multi-color-input]');
+        if (colorInput) colorInput.click();
+        break;
+      }
+
       case 'copy-style':
         if (window.HVE_ContextMenu) {
           window.HVE_ContextMenu.copyStyle(elements[0]);
@@ -809,16 +886,11 @@ window.HVE_Selector = (function () {
         break;
       case 'paste-style':
         if (window.HVE_ContextMenu?.getCopiedStyle()) {
-          window.HVE_ContextMenu.pasteStyle(elements);
+          window.HVE_ContextMenu.pasteStyle(unlocked);
         }
         break;
       case 'delete': {
-        const deletable = elements.filter(el => !el.hasAttribute('data-hve-locked'));
-        if (deletable.length === 0) {
-          if (window.HVE_Core) window.HVE_Core.showToast('元素已锁定，无法删除 🔒', 'info');
-          return;
-        }
-        for (const el of deletable) {
+        for (const el of unlocked) {
           if (window.HVE_History) {
             window.HVE_History.record({
               type: 'dom', element: el,
@@ -850,10 +922,262 @@ window.HVE_Selector = (function () {
     const actionNames = {
       textAlign: '对齐方式',
       width: '宽度',
-      height: '高度'
+      height: '高度',
+      fontSize: '字号',
+      color: '颜色'
     };
     if (window.HVE_Core) {
       window.HVE_Core.showToast(`已批量设置${actionNames[prop] || prop} ✓`, 'success');
+    }
+  }
+
+  // ========== 位置对齐（基于 bounding rect 计算 translate 偏移） ==========
+
+  /**
+   * 批量位置对齐
+   * @param {Element[]} elements - 要对齐的元素列表
+   * @param {'top'|'bottom'|'vcenter'|'hcenter'} type - 对齐方式
+   */
+  function batchPositionAlign(elements, type) {
+    if (elements.length < 2) return;
+
+    // 获取所有元素的 bounding rect 和当前 translate
+    const infos = elements.map(el => {
+      const rect = el.getBoundingClientRect();
+      const { tx, ty } = window.HVE_Helpers.parseTranslate(el.style.transform || '');
+      return { el, rect, tx, ty, beforeTransform: el.style.transform || '' };
+    });
+
+    // 计算对齐基准值
+    let refValue;
+    switch (type) {
+      case 'top':
+        refValue = Math.min(...infos.map(i => i.rect.top));
+        break;
+      case 'bottom':
+        refValue = Math.max(...infos.map(i => i.rect.bottom));
+        break;
+      case 'vcenter': {
+        const minTop = Math.min(...infos.map(i => i.rect.top));
+        const maxBottom = Math.max(...infos.map(i => i.rect.bottom));
+        refValue = (minTop + maxBottom) / 2;
+        break;
+      }
+      case 'hcenter': {
+        const minLeft = Math.min(...infos.map(i => i.rect.left));
+        const maxRight = Math.max(...infos.map(i => i.rect.right));
+        refValue = (minLeft + maxRight) / 2;
+        break;
+      }
+    }
+
+    // 对每个元素计算需要的 translate 偏移并应用
+    for (const info of infos) {
+      let newTx = info.tx;
+      let newTy = info.ty;
+
+      switch (type) {
+        case 'top': {
+          const offset = refValue - info.rect.top;
+          newTy = info.ty + offset;
+          break;
+        }
+        case 'bottom': {
+          const offset = refValue - info.rect.bottom;
+          newTy = info.ty + offset;
+          break;
+        }
+        case 'vcenter': {
+          const center = info.rect.top + info.rect.height / 2;
+          const offset = refValue - center;
+          newTy = info.ty + offset;
+          break;
+        }
+        case 'hcenter': {
+          const center = info.rect.left + info.rect.width / 2;
+          const offset = refValue - center;
+          newTx = info.tx + offset;
+          break;
+        }
+      }
+
+      window.HVE_Helpers.setTranslate(info.el, newTx, info.ty);
+    }
+
+    // 应用完后再统一记录历史（此时 transform 已更新）
+    for (const info of infos) {
+      if (window.HVE_History) {
+        window.HVE_History.record({
+          type: 'move', element: info.el,
+          before: { transform: info.beforeTransform },
+          after: { transform: info.el.style.transform || '' },
+          description: '批量位置对齐'
+        });
+      }
+    }
+
+    const names = { top: '顶部', bottom: '底部', vcenter: '垂直居中', hcenter: '水平居中' };
+    if (window.HVE_Core) {
+      window.HVE_Core.showToast(`已${names[type]}对齐 ✓`, 'success');
+    }
+  }
+
+  // ========== 等间距分布 ==========
+
+  /**
+   * 批量等间距分布
+   * @param {Element[]} elements - 要分布的元素列表
+   * @param {'horizontal'|'vertical'} direction - 分布方向
+   */
+  function batchDistribute(elements, direction) {
+    if (elements.length < 3) {
+      if (window.HVE_Core) window.HVE_Core.showToast('等间距分布至少需要 3 个元素', 'info');
+      return;
+    }
+
+    const infos = elements.map(el => {
+      const rect = el.getBoundingClientRect();
+      const { tx, ty } = window.HVE_Helpers.parseTranslate(el.style.transform || '');
+      return { el, rect, tx, ty, beforeTransform: el.style.transform || '' };
+    });
+
+    if (direction === 'horizontal') {
+      // 按 left 排序
+      infos.sort((a, b) => a.rect.left - b.rect.left);
+      const leftmost = infos[0].rect.left;
+      const rightmost = infos[infos.length - 1].rect.right;
+      const totalWidth = infos.reduce((sum, i) => sum + i.rect.width, 0);
+      const totalGap = rightmost - leftmost - totalWidth;
+      const gap = totalGap / (infos.length - 1);
+
+      let currentX = leftmost;
+      for (const info of infos) {
+        const offset = currentX - info.rect.left;
+        if (Math.abs(offset) > 0.5) {
+          const newTx = info.tx + offset;
+          window.HVE_Helpers.setTranslate(info.el, newTx, info.ty);
+        }
+        currentX += info.rect.width + gap;
+      }
+    } else {
+      // 按 top 排序
+      infos.sort((a, b) => a.rect.top - b.rect.top);
+      const topmost = infos[0].rect.top;
+      const bottommost = infos[infos.length - 1].rect.bottom;
+      const totalHeight = infos.reduce((sum, i) => sum + i.rect.height, 0);
+      const totalGap = bottommost - topmost - totalHeight;
+      const gap = totalGap / (infos.length - 1);
+
+      let currentY = topmost;
+      for (const info of infos) {
+        const offset = currentY - info.rect.top;
+        if (Math.abs(offset) > 0.5) {
+          const newTy = info.ty + offset;
+          window.HVE_Helpers.setTranslate(info.el, info.tx, newTy);
+        }
+        currentY += info.rect.height + gap;
+      }
+    }
+
+    // 应用完后再统一记录历史
+    for (const info of infos) {
+      const currentTransform = info.el.style.transform || '';
+      if (currentTransform !== info.beforeTransform) {
+        if (window.HVE_History) {
+          window.HVE_History.record({
+            type: 'move', element: info.el,
+            before: { transform: info.beforeTransform },
+            after: { transform: currentTransform },
+            description: direction === 'horizontal' ? '水平等间距分布' : '垂直等间距分布'
+          });
+        }
+      }
+    }
+
+    const names = { horizontal: '水平', vertical: '垂直' };
+    if (window.HVE_Core) {
+      window.HVE_Core.showToast(`已${names[direction]}等间距分布 ✓`, 'success');
+    }
+  }
+
+  // ========== 批量字号弹窗 ==========
+
+  let fontSizePopover = null;
+
+  function showBatchFontSizePopover(anchorBtn, elements) {
+    closeBatchFontSizePopover();
+
+    fontSizePopover = document.createElement('div');
+    fontSizePopover.setAttribute('data-hve-editor', 'true');
+    fontSizePopover.setAttribute('data-hve-fontsize-popover', 'true');
+
+    const sizes = [12, 14, 16, 18, 20, 24, 28, 32, 36, 48];
+    fontSizePopover.innerHTML = `
+      <div class="hve-fs-title">批量设置字号</div>
+      <div class="hve-fs-grid">
+        ${sizes.map(s => `<button data-fs-value="${s}" class="hve-fs-btn">${s}</button>`).join('')}
+      </div>
+      <div class="hve-fs-custom">
+        <input type="number" data-fs-custom-input min="8" max="200" placeholder="自定义" />
+        <button data-fs-custom-apply class="hve-fs-apply">应用</button>
+      </div>
+    `;
+
+    // 定位到锚点按钮下方
+    const btnRect = anchorBtn.getBoundingClientRect();
+    fontSizePopover.style.cssText = `
+      position: fixed;
+      left: ${btnRect.left}px;
+      top: ${btnRect.bottom + 6}px;
+    `;
+
+    fontSizePopover.addEventListener('click', (e) => {
+      const sizeBtn = e.target.closest('[data-fs-value]');
+      if (sizeBtn) {
+        batchSetStyle(elements, 'fontSize', sizeBtn.dataset.fsValue + 'px');
+        closeBatchFontSizePopover();
+        return;
+      }
+      const applyBtn = e.target.closest('[data-fs-custom-apply]');
+      if (applyBtn) {
+        const input = fontSizePopover.querySelector('[data-fs-custom-input]');
+        const val = parseInt(input.value);
+        if (val >= 8 && val <= 200) {
+          batchSetStyle(elements, 'fontSize', val + 'px');
+          closeBatchFontSizePopover();
+        }
+      }
+    });
+
+    document.body.appendChild(fontSizePopover);
+
+    // 点击外部关闭
+    setTimeout(() => {
+      document.addEventListener('mousedown', onFontSizePopoverOutside);
+    }, 0);
+  }
+
+  function closeBatchFontSizePopover() {
+    document.removeEventListener('mousedown', onFontSizePopoverOutside);
+    if (fontSizePopover && fontSizePopover.parentNode) {
+      fontSizePopover.remove();
+    }
+    fontSizePopover = null;
+  }
+
+  function onFontSizePopoverOutside(e) {
+    if (fontSizePopover && !fontSizePopover.contains(e.target)) {
+      closeBatchFontSizePopover();
+    }
+  }
+
+  // ========== 批量颜色变更 ==========
+
+  function onMultiColorChange(e) {
+    const color = e.target.value;
+    const elements = [...selectedElements].filter(el => !el.hasAttribute('data-hve-locked'));
+    if (elements.length > 0) {
+      batchSetStyle(elements, 'color', color);
     }
   }
 

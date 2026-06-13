@@ -672,6 +672,128 @@ th[data-hve-editing] {
   font-size: 11px;
 }
 
+/* 多选操作栏 — 字号按钮 */
+[data-hve-multi-toast] .hve-multi-btn-fontsize span {
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1;
+}
+
+[data-hve-multi-toast] .hve-multi-btn-fontsize sub {
+  font-size: 9px;
+}
+
+/* 多选操作栏 — 颜色按钮 */
+[data-hve-multi-toast] .hve-multi-btn-color {
+  position: relative;
+  overflow: hidden;
+}
+
+[data-hve-multi-toast] .hve-multi-btn-color::after {
+  content: 'A';
+  font: bold 13px/1 'SF Pro Text', -apple-system, sans-serif;
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+
+[data-hve-multi-toast] [data-multi-color-input] {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  cursor: pointer;
+  border: none;
+  padding: 0;
+}
+
+/* 批量字号弹窗 */
+[data-hve-fontsize-popover] {
+  z-index: 2147483647;
+  width: 200px;
+  padding: 12px;
+  background: #FFFDF9;
+  border: 1px solid #E8E5E0;
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(45, 43, 40, 0.15);
+  font: 13px/1.4 'SF Pro Text', -apple-system, sans-serif;
+  color: #5D534A;
+  animation: hve-panel-in 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+[data-hve-fontsize-popover] .hve-fs-title {
+  font-size: 12px;
+  font-weight: 600;
+  color: #2D2B28;
+  margin-bottom: 8px;
+}
+
+[data-hve-fontsize-popover] .hve-fs-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 4px;
+  margin-bottom: 8px;
+}
+
+[data-hve-fontsize-popover] .hve-fs-btn {
+  height: 28px;
+  border: 1px solid #E8E5E0;
+  border-radius: 6px;
+  background: white;
+  cursor: pointer;
+  font: 11px/1 'SF Pro Text', -apple-system, sans-serif;
+  color: #5D534A;
+  transition: all 0.1s;
+}
+
+[data-hve-fontsize-popover] .hve-fs-btn:hover {
+  background: #FEF3C7;
+  border-color: #D97706;
+  color: #D97706;
+}
+
+[data-hve-fontsize-popover] .hve-fs-custom {
+  display: flex;
+  gap: 4px;
+}
+
+[data-hve-fontsize-popover] [data-fs-custom-input] {
+  flex: 1;
+  height: 28px;
+  padding: 0 8px;
+  border: 1px solid #E8E5E0;
+  border-radius: 6px;
+  font: 12px/1 'SF Pro Text', -apple-system, sans-serif;
+  color: #2D2B28;
+  outline: none;
+  background: white;
+}
+
+[data-hve-fontsize-popover] [data-fs-custom-input]:focus {
+  border-color: #D97706;
+  box-shadow: 0 0 0 2px rgba(217, 119, 6, 0.15);
+}
+
+[data-hve-fontsize-popover] .hve-fs-apply {
+  height: 28px;
+  padding: 0 10px;
+  border: none;
+  border-radius: 6px;
+  background: #D97706;
+  color: white;
+  font: 12px/1 'SF Pro Text', -apple-system, sans-serif;
+  cursor: pointer;
+  transition: background 0.1s;
+}
+
+[data-hve-fontsize-popover] .hve-fs-apply:hover {
+  background: #B45309;
+}
+
 /* ---- 锁定元素 ---- */
 [data-hve-locked] {
   cursor: not-allowed !important;
@@ -1892,4 +2014,164 @@ th[data-hve-editing] {
   font-size: 10px;
   color: #B8ADA4;
   margin: 0 1px;
+}
+
+/* ============================================
+   查找替换面板样式
+   ============================================ */
+
+/* CSS Custom Highlight API 高亮样式 */
+::highlight(hve-find) {
+  background-color: rgba(250, 204, 21, 0.45);
+  color: inherit;
+}
+
+::highlight(hve-find-current) {
+  background-color: rgba(217, 119, 6, 0.55);
+  color: inherit;
+}
+
+/* 查找替换面板 */
+[data-hve-find-panel] {
+  position: fixed;
+  top: 16px;
+  right: 20px;
+  width: 340px;
+  z-index: 2147483647;
+  background: #FFFDF9;
+  border: 1px solid #E8E5E0;
+  border-radius: 14px;
+  box-shadow: 0 8px 24px rgba(45, 43, 40, 0.15);
+  font: 13px/1.4 'SF Pro Text', -apple-system, sans-serif;
+  color: #5D534A;
+  padding: 12px 14px;
+  animation: hve-panel-in 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+[data-hve-find-panel] .hve-fr-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+[data-hve-find-panel] .hve-fr-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: #2D2B28;
+}
+
+[data-hve-find-panel] .hve-fr-close {
+  width: 24px;
+  height: 24px;
+  border: none;
+  background: transparent;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 16px;
+  color: #9C8E82;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s;
+  line-height: 1;
+}
+
+[data-hve-find-panel] .hve-fr-close:hover {
+  background: #F0EDE8;
+  color: #2D2B28;
+}
+
+[data-hve-find-panel] .hve-fr-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 6px;
+}
+
+[data-hve-find-panel] .hve-fr-find-input,
+[data-hve-find-panel] .hve-fr-replace-input {
+  flex: 1;
+  height: 32px;
+  padding: 0 10px;
+  border: 1px solid #E8E5E0;
+  border-radius: 8px;
+  font: 13px/1 'SF Pro Text', -apple-system, sans-serif;
+  color: #2D2B28;
+  background: white;
+  outline: none;
+  box-sizing: border-box;
+  transition: border-color 0.2s;
+}
+
+[data-hve-find-panel] .hve-fr-find-input:focus,
+[data-hve-find-panel] .hve-fr-replace-input:focus {
+  border-color: #D97706;
+  box-shadow: 0 0 0 3px rgba(217, 119, 6, 0.1);
+}
+
+[data-hve-find-panel] .hve-fr-count {
+  font-size: 11px;
+  color: #9C8E82;
+  white-space: nowrap;
+  min-width: 36px;
+  text-align: right;
+}
+
+[data-hve-find-panel] .hve-fr-actions {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+}
+
+[data-hve-find-panel] .hve-fr-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border: none;
+  border-radius: 7px;
+  background: transparent;
+  cursor: pointer;
+  font-size: 12px;
+  color: #5D534A;
+  transition: all 0.12s ease;
+  padding: 0;
+}
+
+[data-hve-find-panel] .hve-fr-btn:hover {
+  background: #F0EDE8;
+  color: #2D2B28;
+}
+
+[data-hve-find-panel] .hve-fr-btn:active {
+  background: #E8E5E0;
+  transform: scale(0.92);
+}
+
+[data-hve-find-panel] .hve-fr-btn-replace,
+[data-hve-find-panel] .hve-fr-btn-replace-all {
+  width: auto;
+  padding: 0 10px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+[data-hve-find-panel] .hve-fr-btn-replace:hover {
+  background: #FEF3C7;
+  color: #D97706;
+}
+
+[data-hve-find-panel] .hve-fr-btn-replace-all:hover {
+  background: #FEF3C7;
+  color: #D97706;
+}
+
+[data-hve-find-panel] .hve-fr-sep {
+  width: 1px;
+  height: 18px;
+  background: #E8E5E0;
+  margin: 0 3px;
+  flex-shrink: 0;
 }
