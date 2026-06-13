@@ -400,6 +400,8 @@ window.HVE_InsertPanel = (function () {
       { icon: '🔗', title: '链接', desc: '添加超链接文本', type: 'link' },
       { icon: '📋', title: '列表', desc: '添加项目列表', type: 'list' },
       { icon: '💬', title: '引用', desc: '添加引用区块', type: 'blockquote' },
+      { icon: '📥', title: 'Markdown 导入', desc: '粘贴 Markdown 转为页面', type: 'markdown' },
+      { icon: '🎨', title: '从模板创建', desc: '选择内置模板快速开始', type: 'template' },
     ];
 
     let html = '<div class="hve-ip-title">插入元素</div>';
@@ -547,6 +549,18 @@ window.HVE_InsertPanel = (function () {
       const intoBox = isInsertIntoBox;
       hidePanel();
       showLinkDialogForInsert(target, pos, intoBox);
+      return;
+    }
+
+    if (type === 'markdown') {
+      hidePanel();
+      if (window.HVE_MarkdownImport) window.HVE_MarkdownImport.openPanel();
+      return;
+    }
+
+    if (type === 'template') {
+      hidePanel();
+      if (window.HVE_TemplateSystem) window.HVE_TemplateSystem.openPanel();
       return;
     }
 

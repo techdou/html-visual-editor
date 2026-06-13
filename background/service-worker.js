@@ -87,6 +87,8 @@ async function injectContentScripts(tabId) {
         'content/chart-typography.js',
         'content/shortcut-system.js',
         'content/find-replace.js',
+        'content/markdown-import.js',
+        'content/template-system.js',
         'content/editor-core.js'
       ]
     });

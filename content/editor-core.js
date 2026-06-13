@@ -22,6 +22,8 @@ window.HVE_Core = (function () {
     if (window.HVE_PDFPaginator) window.HVE_PDFPaginator.activate();
     if (window.HVE_ChartTypo) window.HVE_ChartTypo.activate();
     if (window.HVE_FindReplace) window.HVE_FindReplace.activate();
+    if (window.HVE_MarkdownImport) window.HVE_MarkdownImport.activate();
+    if (window.HVE_TemplateSystem) window.HVE_TemplateSystem.activate();
 
     document.addEventListener('keydown', onKeyDown, true);
     showStatusIndicator();
@@ -48,6 +50,8 @@ window.HVE_Core = (function () {
     if (window.HVE_PDFPaginator) window.HVE_PDFPaginator.deactivate();
     if (window.HVE_ChartTypo) window.HVE_ChartTypo.deactivate();
     if (window.HVE_FindReplace) window.HVE_FindReplace.deactivate();
+    if (window.HVE_MarkdownImport) window.HVE_MarkdownImport.deactivate();
+    if (window.HVE_TemplateSystem) window.HVE_TemplateSystem.deactivate();
 
     document.removeEventListener('keydown', onKeyDown, true);
     hideStatusIndicator();

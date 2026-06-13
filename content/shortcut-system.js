@@ -364,6 +364,43 @@ window.HVE_Shortcuts = (function () {
     condition: () => !window.HVE_TextEdit?.isEditing() || true,
   });
 
+  // ========== 注册 Markdown 导入 / 模板系统快捷键 ==========
+
+  register({
+    combo: 'Ctrl+Shift+M',
+    action: () => {
+      if (window.HVE_TextEdit?.isEditing()) window.HVE_TextEdit.finishEditing();
+      if (window.HVE_MarkdownImport) window.HVE_MarkdownImport.openPanel();
+      return true;
+    },
+    description: 'Markdown 导入',
+    category: '文件',
+    condition: () => !window.HVE_TextEdit?.isEditing() || true,
+  });
+
+  register({
+    combo: 'Ctrl+Shift+T',
+    action: () => {
+      if (window.HVE_TextEdit?.isEditing()) window.HVE_TextEdit.finishEditing();
+      if (window.HVE_TemplateSystem) window.HVE_TemplateSystem.openPanel();
+      return true;
+    },
+    description: '从模板创建',
+    category: '文件',
+    condition: () => !window.HVE_TextEdit?.isEditing() || true,
+  });
+
+  register({
+    combo: 'Ctrl+Shift+R',
+    action: () => {
+      if (window.HVE_TemplateSystem) window.HVE_TemplateSystem.emergencyRevert();
+      return true;
+    },
+    description: '恢复模板套用前的状态',
+    category: '文件',
+    condition: () => !window.HVE_TextEdit?.isEditing() || true,
+  });
+
   // ========== 公共 API ==========
 
   return {
